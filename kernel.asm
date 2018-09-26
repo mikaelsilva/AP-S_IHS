@@ -357,7 +357,7 @@ deletar:
 	call ferrou
 	call pularLinha
 
-ret
+iret
 
 listarA:
 	push si
@@ -455,7 +455,7 @@ listarC:
 	
 	pop di
 	pop si
-ret
+iret
 
 
 
@@ -493,7 +493,7 @@ tostring: ; ax = 9999
 
 	div bx ; ax = 999, dx = 9
 	xchg ax, dx; swap ax, dx
-	add ax, 48 ; 9 + '0' = '9'
+	add ax, 48 ; 9 	+ '0' = '9'
 	stosb
 	xchg ax, dx
 	jmp .loop1
@@ -516,13 +516,15 @@ ret
 
 
 start: 
-		 push ds
+
+;usamos a interrupcao 40h para tratar a subrotina printS
+	push ds
 		 mov ax, 0
 		 mov ds, ax
-		 mov di, 100h
+		 mov di, 100h ; 100h =  offset da interrupcao 40h na IVT
 		 mov word[di], printS
 		 mov word[di + 2], 0
-		 pop ds
+	 pop ds
 
 		
     		 mov di, 0x500		 		
@@ -573,7 +575,19 @@ a3:
 call print
 call pularLinha
 
-call editar
+;utilizamos a interrupcao 56h para tratar a subrotina de editar
+
+		push ds
+		 mov ax, 0
+		 mov ds, ax
+		 mov di, 158h ;158h = offset da interrupcao 56h na IVT
+		 mov word[di], editar
+		 mov word[di + 2], 0
+		 pop ds
+		mov di, 0x500
+		int 56h
+	
+
 call pularLinha
 jmp loop
 
@@ -588,7 +602,6 @@ jmp loop
 a5:
 call print
 call pularLinha
-
 call listarA
 call pularLinha
 jmp loop
@@ -597,7 +610,16 @@ a6:
 call print
 call pularLinha
 
-call listarC
+;usamos a interrupcao 41h para tratar a subrotina de listar contas
+		push ds 
+		 mov ax, 0 
+		 mov ds, ax 
+		 mov di, 104h ; 104h = offset da interrupcao 41h na IVT
+		 mov word[di], listarC 
+		 mov word[di + 2], 0
+		pop ds
+		 mov di, 0x500
+		int 41h
 call pularLinha
 jmp loop
 
