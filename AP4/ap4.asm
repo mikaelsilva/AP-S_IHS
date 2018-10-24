@@ -41,7 +41,7 @@ fld qword[sinal]
 fdivrp				;divido por ((-1)^i)/(2i+1)
 fadd qword[value]	;somo o novo passo ao valor calculado anteriormente
 
-fst qword[value]
+fstp qword[value]
 
 
 push dword[value+4]		;passo o final do valor
@@ -53,7 +53,7 @@ add esp, 12				;necessário para rearrumar a pilha do contrário ela ia ficar co
 pop eax
 inc eax
 
-cmp eax, 10000
+cmp eax, 100000
 jne cont
 
 
