@@ -6,23 +6,47 @@ s: dq -1.0
 
 teste: dq 1
 aux: dd -1	;contador para o i
-aux2: dd 1
-aux3: dq 1.0
+aux2: dq 20000.0
+aux3: dq 30000.0
+aux5: dq -1.0
 result: dq 0.0
+result2: dq -1.0
 x: dq 5.0
+diff: dq 0.0
+angulo: dq 0.0
 
-str: db 'Valor = %f',13, 10, 0	;argumento do printf
+str: db 'Valor = %f %f',13, 10, 0	;argumento do printf
 str2: db 'Valor = %d',13, 10, 0 ;argumento do printf
 str3: db 'meu deus',13,10,0
 section .text	;inicio do codigo
-global main	
+global sen	
 
-main:
+sen:
 
+;COLOCANDO OS VALORES QUE ESTÃO NAS PILHAS PARA AS RESPECTIVAS VARIAVEIS
+;---------------------------------------------------
+enter 0,0
+finit
+
+fld dword[ebp+16]
+fstp qword[x]
+
+fld dword[ebp+16]
+
+fsin 
+fstp qword[angulo]
+
+
+fld dword[ebp+20]
+fstp qword[diff]
+
+;-----------------------------------------------------
 mov eax, 0
 
+
+
 cont:
-;;--------------------------------------------
+;--------------------------------------------
 fld qword[sinal];o sinal para controlar a variação (-1)^i
 fmul qword[s]
 fstp qword[sinal]
@@ -74,31 +98,54 @@ fmul qword[sinal]		;multiplico x^(2i+1) * (-1)^i
 
 fdiv qword[value]		;divido x^(2i+1) * (-1)^i / (2i+1)!
 fadd qword[result]		;somatorio
-fstp  qword[result]; 	;guardo o resultado
+fstp qword[result]; 	;guardo o resultado
 
 
 push ecx
 push eax
-push dword[result+4]
-push dword[result]		;passo o inicio do valor
-push dword str			;passo o argumento do printf
-call printf				;chamo o printf
-add esp, 12
+
+;push dword[result+4]
+;push dword[result]		;passo o inicio do valor
+;push dword str			;passo o argumento do printf
+;call printf			;chamo o printf
+;add esp, 12
+
 pop eax
 pop ecx
 
-;push dword[value+4]		;passo o final do valor
-;push dword[value]		;passo o inicio do valor
-push dword str3			;passo o argumento do printf
-call printf				;chamo o printf
-add esp, 4
 
-pop eax
+fld qword[result]
+fld qword[result2]
+fcomip st0,st1
+je sair
+
+
+
 inc eax
+fstp qword[result2]
 
-cmp eax, 1000		;itera até 1000 passos
+
+
+cmp eax,100000
 jne cont
 
-mov eax, 1
-mov ebx, 0
-int 80h
+
+
+sair:
+
+;VALORES PARA SALVAR NOS ENDEREÇOS CEDIDOS NA TESTE.C
+push ebx
+	fild dword[aux]
+	mov ebx, dword[ebp+12]
+	fstp dword[ebx]
+pop ebx
+
+push ebx
+	mov ebx, dword[ebp+8]
+	fld qword[result]
+	fstp dword[ebx] 
+pop ebx
+;-------------------------------------------------------
+
+leave
+ret
