@@ -9,13 +9,13 @@ s: dq -1.0
 aux: dd -1	;contador para o i
 str: db 'Valor = %f',13, 10, 0	;argumento do printf
 str2: db 'Valor = %d',13, 10, 0 ;argumento do printf
+str3: db 'Valor = %d',13, 10, 0 ;argumento do printf
 section .text	;inicio do codigo
 global main	
 
 main:
 
 mov eax, -1
-
 
 
 cont:
